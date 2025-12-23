@@ -33,35 +33,68 @@ export default async function handler(req, res) {
         if (!oldUser) {
           return res.status(404).json({ message: "User not found" });
         }
+        const username = req.body.username ?? oldUser.username;
+        const email = req.body.email ?? oldUser.email;
+        const phone = req.body.phone ?? oldUser.phone;
+        const status = req.body.status ?? oldUser.status;
 
-        const exists = await User.findOne({
-          _id: { $ne: id },
-          $or: [
-            { username: req.body.username },
-            { email: req.body.email },
-            { phone: req.body.phone },
-          ],
-        });
+        const isNothingChanged =
+          username === oldUser.username &&
+          email === oldUser.email &&
+          phone === oldUser.phone &&
+          status === oldUser.status &&
+          image === oldUser.image;
 
-        if (exists) {
+        if (isNothingChanged) {
           return res.status(400).json({
-            message: "Username / Email / Phone already exists",
+            message: "Please update at least one field",
           });
+        }
+
+        const  orConditions = [];
+        if (username !== oldUser.username) orConditions.push({ username });
+        if (email !== oldUser.email) orConditions.push({ email });
+        if (phone !== oldUser.phone) orConditions.push({ phone });
+
+        if (orConditions.length > 0) {
+          const exists = await User.findOne({
+            _id: { $ne: id },
+            $or: orConditions,
+            // [
+            //   username !== oldUser.username ? { username } : null,
+            //   email !== oldUser.email ? { email } : null,
+            //   phone !== oldUser.phone ? { phone } : null,
+            // ].filter(Boolean),
+          });
+
+          if (exists) {
+            return res.status(400).json({
+              message: "Username / Email / Phone already exists",
+            });
+          }
         }
         const updatedUser = await User.findByIdAndUpdate(
           id,
+          // {
+          //   username: req.body.username,
+          //   email: req.body.email,
+          //   phone: req.body.phone,
+          //   status: req.body.status,
+          //   image: req.file
+          //     ? `/uploads/${req.file.filename}`
+          //     : oldUser.image,
+          // },
           {
-            username: req.body.username,
-            email: req.body.email,
-            phone: req.body.phone,
-            status: req.body.status,
+            username,
+            email,
+            phone,
+            status,
             image: req.file
-              ? `/uploads/${req.file.filename}` 
+              ? `/uploads/${req.file.filename}`
               : oldUser.image,
           },
           { new: true }
-        );
-
+        ); 
         return res.status(200).json(updatedUser);
       } catch (error) {
         return res.status(500).json({ error: error.message });

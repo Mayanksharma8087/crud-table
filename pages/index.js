@@ -54,8 +54,6 @@ export default function Home() {
     }
   }, [limit]);
 
-  
-
   useEffect(() => {
     fetch(`/api/users?page=${page}&limit=${limit}&search=${search}`)
       .then(res => res.json())

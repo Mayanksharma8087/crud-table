@@ -1,9 +1,10 @@
 "use client";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { BiEdit, BiTrashAlt } from "react-icons/bi";
 
-export default function Table({ users, setUsers, setEditingUser }) {
-
+export default function Table({ users = [], setUsers, setEditingUser }) {
+    const router =useRouter();
     // const [page, setPage] = useState(1);
     // const [totalPage, setTotalPages] = useState(1);
     // const limit = 5;
@@ -12,17 +13,17 @@ export default function Table({ users, setUsers, setEditingUser }) {
     // const start = (page - 1) * limit;
     // const paginatedUsers = users.slice(start, start + limit);
 
-    useEffect(() => {
-  fetch(`/api/users`)
-//   fetch(`/api/users?page=${page}&limit=5`)
-    .then(res => res.json())
-    .then(data => {
-      setUsers(data.users);
-    //   setTotalPages(data.totalPages);
-    });
-}, []
-// [page]
-);
+    //     useEffect(() => {
+    //   fetch(`/api/users`)
+    // //   fetch(`/api/users?page=${page}&limit=5`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //       setUsers(data.users);
+    //     //   setTotalPages(data.totalPages);
+    //     });
+    // }, []
+    // [page]
+    // );
     const deleteUser = async (id) => {
         if (!confirm("Delete user?")) return;
         await fetch(`/api/users/${id}`, { method: "DELETE" });
@@ -89,7 +90,7 @@ export default function Table({ users, setUsers, setEditingUser }) {
                                 {/* Actions */}
                                 <td className="px-6 py-4">
                                     <div className="flex justify-center gap-4">
-                                        <button onClick={() => setEditingUser(user)}>
+                                        <button onClick={() => router.push(`/table/${user._id}`)}>
                                             <BiEdit size={22} className="text-green-500" />
                                         </button>
 

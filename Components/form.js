@@ -1,7 +1,10 @@
 "use client";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 const DEFAULT_AVATAR = "/avatar.png";
 export default function Form({ editingUser, setEditingUser, setUsers }) {
+const router = useRouter();
+    console.log(editingUser, "editingUsereditingUsereditingUser")
     const [formData, setFormData] = useState({
         username: "",
         email: "",
@@ -110,7 +113,7 @@ export default function Form({ editingUser, setEditingUser, setUsers }) {
 
         setEditingUser(null);
         resetForm();
-
+        router.push('/')
     };
 
     useEffect(() => {
