@@ -16,7 +16,8 @@ export default function Home() {
   const [newUser, setIsNewUser] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const isFirstRender = useRef(true);
-  const limit = 5;
+  const [limit, setLimit] = useState(5);
+  // const limit = 5;
 
   // const totalPages = Math.ceil(users.length / limit);
   // const start = (page - 1) * limit;
@@ -35,30 +36,34 @@ export default function Home() {
     if (!router.isReady) return;
     const urlPage = Number(router.query.page) || 1;
     setPage(urlPage);
-  }, [router.isReady, router.query.page]);
+     const urlLimit = Number(router.query.limit) || 5;
+  setLimit(urlLimit);
+  }, [router.isReady, router.query.page,router.query.limit]);
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (Number(router.query.page) !== page) {
+    if (Number(router.query.limit) !== limit) {
       router.replace(
         {
           pathname: router.pathname,
-          query: { ...router.query, page },
+          query: { ...router.query, limit },
         },
         undefined,
         { shallow: true }
       );
     }
-  }, [page]);
+  }, [limit]);
+
+  
 
   useEffect(() => {
-    fetch(`/api/users?page=${page}&limit=5&search=${search}`)
+    fetch(`/api/users?page=${page}&limit=${limit}&search=${search}`)
       .then(res => res.json())
       .then(data => {
         setUsers(data.users);
         setTotalPages(data.totalPages);
       });
-  }, [page, search]);
+  }, [page, limit, search]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -68,7 +73,9 @@ export default function Home() {
     setPage(1);
   }, [search]);
 
-
+useEffect(()=>{
+  setPage(1);
+},[limit]);
   return (
     <div className="container mx-auto py-5">
       <div className="flex justify-between items-center ">
@@ -112,6 +119,8 @@ export default function Home() {
         />
       </div>
 
+{/* <> */}
+{/* 
       {totalPage > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <button
@@ -120,9 +129,9 @@ export default function Home() {
             disabled={page === 1}>
             prev
           </button>
-          {/* <span className="font-semibold"> page{page} of {totalPage}</span> */}
-            <div className="flex justify-center gap-2 mt-1">
-  {[...Array(totalPage)].map((_, i) => (
+          /* <span className="font-semibold"> page{page} of {totalPage}</span> */
+            /* <div className="flex justify-center gap-2 mt-1"> */
+  /* {[...Array(totalPage)].map((_, i) => (
     <button
       key={i}
       onClick={() => setPage(i + 1)}
@@ -134,8 +143,8 @@ export default function Home() {
     >
       {i + 1}
     </button>
-  ))}
-</div>
+  ))} */}
+{/* </div>
           <button
             onClick={() => setPage(p => p + 1)}
             className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
@@ -144,8 +153,50 @@ export default function Home() {
           </button>
 
         </div>
-      )}
+      )} */}
+{/* // </>  */}
+
     
+
+{/* <div className="flex justify-between items-center mt-4"> */}
+<div className="flex justify-between items-center mt-4">
+        {/* Page Size Dropdown */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Rows per page:</span>
+          <select
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+          </select>
+        </div>
+
+        {/* Pagination Buttons */}
+        {totalPage > 1 && (
+          <div className="flex gap-2">
+            {[...Array(totalPage)].map((_, i) => {
+              const pageNumber = i + 1;
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  className={`px-3 py-1 rounded 
+              ${page === pageNumber
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
 
 
     </div>
