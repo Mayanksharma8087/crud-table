@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 const DEFAULT_AVATAR = "/avatar.png";
 export default function Form({ editingUser, setEditingUser, setUsers }) {
-const router = useRouter();
+    const router = useRouter();
     console.log(editingUser, "editingUsereditingUsereditingUser")
     const [formData, setFormData] = useState({
         username: "",
@@ -59,6 +59,19 @@ const router = useRouter();
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (editingUser) {
+            const isNothingChanged =
+                formData.username === editingUser.username &&
+                formData.email === editingUser.email &&
+                formData.phone === editingUser.phone &&
+                formData.status === editingUser.status &&
+                !formData.image;
+
+            if (isNothingChanged) {
+                alert("Please update at least one field");
+                return;
+            }
+        }
         if (formData.username.length > 30) {
             alert("username must be max 30 character");
             return;
@@ -113,7 +126,7 @@ const router = useRouter();
 
         setEditingUser(null);
         resetForm();
-        router.push('/')
+        router.push('/table')
     };
 
     useEffect(() => {
@@ -230,7 +243,7 @@ const router = useRouter();
                 </div>
 
                 <button
-                    disabled={isFormValid}
+                    disabled={!isFormValid()}
                     className={`w-full py-2 rounded-md text-white ${!isFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-green-500"}`}
                 >
                     {editingUser ? "Update User" : "Create User"}
