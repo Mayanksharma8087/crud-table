@@ -15,6 +15,7 @@ export default function WelcomeModal({ users }) {
   const openModal = () => {
     setIsModalOpen(true);
     setStep("input");
+    d;
     setError("");
   };
 
@@ -22,9 +23,17 @@ export default function WelcomeModal({ users }) {
   const handleUserSubmit = async (e) => {
     e.preventDefault();
 
-    const user = users.find(
-      (u) => u.email === inputValue || u.phone === inputValue
-    );
+    // const user = users.find(
+    //   (u) => u.email === inputValue || u.phone === inputValue
+    // );
+    const resa = await fetch(`/api/users?search=${inputValue}`);
+    const dataa = await resa.json();
+console.log(dataa,"aq")
+    if (!dataa.users || dataa.users.length === 0) {
+      setError("User not found ❌");
+      return;
+    }
+    const user = dataa.users[0];
 
     if (!user) {
       setError("User not found ❌");
@@ -49,7 +58,7 @@ export default function WelcomeModal({ users }) {
     setFoundUser(user);
     setStep("otp");
     setDebugOtp(data.otp);
-    setError("")
+    setError("");
     // const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
     // setGeneratedOtp(otpCode);
     // setFoundUser(user);
@@ -85,7 +94,6 @@ export default function WelcomeModal({ users }) {
     }
     console.log("VERIFY SUCCESS 👉", data);
     setStep("welcome");
-
   };
 
   const closeModal = () => {
@@ -147,10 +155,13 @@ export default function WelcomeModal({ users }) {
             {/* STEP 3 */}
             {step === "welcome" && (
               <div className="flex flex-col items-center gap-3">
-                <img src={foundUser.image || " avatar.png"} alt="user" classname="w-35 h-35 rounded-full object-cover border" />
+                <img
+                  src={foundUser.image || " avatar.png"}
+                  alt="user"
+                  classname="w-35 h-35 rounded-full object-cover border"
+                />
                 <h2 className="text-xl font-bold">Welcome 🎉</h2>
                 <p className="mt-2">{foundUser.username}</p>
-
               </div>
             )}
 

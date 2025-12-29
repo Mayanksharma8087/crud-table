@@ -2,7 +2,6 @@ import connectDb from "@/library/connectDb";
 import User from "@/models/user";
 import multer from "multer";
 
-
 export const config = {
   api: {
     bodyParser: false,
@@ -22,38 +21,38 @@ export default async function handler(req, res) {
   await connectDb();
   const { id } = req.query;
 
-if (req.method === "PUT") {
-  upload.single("image")(req, res, async (err) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    try {
-      const user = await User.findById(id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+  if (req.method === "PUT") {
+    upload.single("image")(req, res, async (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
       }
 
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        {
-          username: req.body.username,
-          email: req.body.email,
-          phone: req.body.phone,
-          status: req.body.status,
-          image: req.file ? `/uploads/${req.file.filename}` : user.image,
-        },
-        { new: true }
-      );
+      try {
+        const user = await User.findById(id);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
 
-      return res.status(200).json(updatedUser);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  });
+        const updatedUser = await User.findByIdAndUpdate(
+          id,
+          {
+            username: req.body.username,
+            email: req.body.email,
+            phone: req.body.phone,
+            status: req.body.status,
+            image: req.file ? `/uploads/${req.file.filename}` : user.image,
+          },
+          { new: true }
+        );
 
-  return; // 🔥 REQUIRED — stops 405 from executing
-}
+        return res.status(200).json(updatedUser);
+      } catch (error) {
+        return res.status(500).json({ error: error.message });
+      }
+    });
+
+    return; // 🔥 REQUIRED — stops 405 from executing
+  }
 
   // if (req.method === "PUT") {
   //   upload.single("image")(req, res, async (err) => {
@@ -127,7 +126,7 @@ if (req.method === "PUT") {
   //             : oldUser.image,
   //         },
   //         { new: true }
-  //       ); 
+  //       );
   //       return res.status(200).json(updatedUser);
   //     } catch (error) {
   //       return res.status(500).json({ error: error.message });
